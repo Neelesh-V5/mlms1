@@ -2,65 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       margin: 0;
-      background: linear-gradient(135deg, #4e54c8, #8f94fb);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 0;
+      background: linear-gradient(to right, #4e54c8, #8f94fb);
+      font-family: Arial, sans-serif;
       color: white;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      overflow: hidden;
-    }
-
-    .loader {
-      text-align: center;
-      animation: fadeIn 1s ease-in-out;
+      flex-direction: column;
     }
 
     .spinner {
-      border: 8px solid rgba(255, 255, 255, 0.2);
-      border-top: 8px solid white;
+      width: 50px;
+      height: 50px;
+      border: 6px solid rgba(255, 255, 255, 0.3);
+      border-top: 6px solid white;
       border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      margin: 0 auto 20px;
       animation: spin 1s linear infinite;
+      margin-bottom: 20px;
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      to { transform: rotate(360deg); }
     }
 
     h1 {
-      font-size: 1.5rem;
+      font-size: 1.5em;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div class="loader">
-    <div class="spinner"></div>
-    <h1>Redirecting... Please wait</h1>
-  </div>
+  <div class="spinner"></div>
+  <h1>Redirecting... Please wait</h1>
 
-  <!-- Place script just before </body> so it's guaranteed to run after render -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      console.log("Page loaded. Waiting to redirect...");
+    // Ensure this runs after DOM is visible
+    window.onload = function () {
       setTimeout(function () {
-        window.location.href = "/destination"; // <- CHANGE this to your real path
-      }, 5000); // 5000 ms = 5 seconds
-    });
+        window.location.href = "/destination";  // <-- Replace with your route
+      }, 5000); // 5000ms = 5 seconds
+    };
   </script>
 </body>
 </html>
