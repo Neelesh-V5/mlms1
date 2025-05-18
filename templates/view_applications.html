@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Applications</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='lrstyles.css') }}"> -->
+    <style>
+body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            display: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                max-height: 0;
+                overflow: hidden;
+                flex-direction: column;
+                background-color: #007bff;
+                transition: max-height 0.4s ease;
+                width: 100%;
+            }
+
+            .nav-links.show {
+                max-height: 500px;
+            }
+
+            .nav-links li {
+                padding: 10px 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        thead {
+            background-color: #007bff;
+            color: white;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        /* For the no applications message */
+        .no-applications {
+            text-align: center;
+            font-size: 18px;
+            color: #888;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+                {% if session.user_role == 'laborer' %}
+                <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+                
+                <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+                <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+                <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+                {% else %}
+                <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
+                <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Applications for Job: {{ job['job_title'] }}</h1>
+        <h3>Company: {{ job['company_name'] }} | Location: {{ job['location'] }}</h3>
+        {% if applications %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Laborer Name</th>
+                    <th>Application Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for application in applications %}
+                <tr>
+                    <td>{{ application['laborer_name'] }}</td>
+                    <td>{{ application['status'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-applications">No applications yet for this job.</p>
+        {% endif %}
+    </div>
+</body>
+<script>
+    function toggleMenu() {
+        const links = document.getElementById('nav-links');
+        const button = document.getElementById('hamburger');
+        const expanded = links.classList.toggle('show');
+        button.setAttribute('aria-expanded', expanded);
+    }
+</script>
+</html>

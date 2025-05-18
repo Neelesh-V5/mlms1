@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('serve_static', filename='styles.css') }}">
+</head>
+
+<body>
+    <h1>Admin Dashboard</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="flash-message {{ category }}" style="background-color: {{ 'tomato' if category == 'error' else '#d4edda' }};
+                    color: {{ '#721c24' if category == 'error' else '#155724' }};
+                    padding: 10px;
+                    margin: 15px auto;
+                    border: 1px solid {{ '#f5c6cb' if category == 'error' else '#c3e6cb' }};
+                    border-radius: 5px;
+                    max-width:250px;
+                    text-align:center;">
+        ⚠️ {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <h2>Employers</h2>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th>License</th>
+            <th>Verified?</th>
+            <th>Actions</th>
+
+        </tr>
+        {% for employer in employers %}
+        <tr>
+            <td>{{ employer['name'] }}</td>
+            <td>{{ employer['phone'] }}</td>
+            <td>{{ employer['email'] }}</td>
+            <td>{{ employer['company_name'] or 'N/A' }}</td>
+            <td>
+                {% if employer['license'] %}
+                <img src="{{ url_for('uploaded_file', filename=employer['license'].split('/')[-1]) }}" width="100">
+
+
+                {% else %}
+                N/A
+                {% endif %}
+            </td>
+
+            <td>{{ 'Yes' if employer['verified'] else 'No' }}</td>
+
+            <td>
+                {% if not employer['verified'] %}
+                <form method="POST" action="{{ url_for('verify_license') }}">
+                    <input type="hidden" name="employer_id" value="{{ employer['id'] }}">
+                    <button type="submit" name="verify_license">✅ Verify</button>
+                </form>
+                {% else %}
+                Already Verified
+                {% endif %}
+            </td>
+
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Laborers</h2>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Language</th>
+            <th>Aadhar</th>
+        </tr>
+        {% for laborer in laborers %}
+        <tr>
+            <td>{{ laborer['name'] }}</td>
+            <td>{{ laborer['phone'] }}</td>
+            <td>{{ laborer['language'] }}</td>
+            <td>{{ laborer['aadhar'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Jobs</h2>
+    <table border="1">
+        <tr>
+            <th>Job Title</th>
+            <th>Company</th>
+            <th>Location</th>
+            <th>Salary</th>
+
+        </tr>
+        {% for job in jobs %}
+        <tr>
+            <td>{{ job['job_title'] }}</td>
+            <td>{{ job['company_name'] }}</td>
+            <td>{{ job['location'] }}</td>
+            <td>₹{{ job['salary'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <h2>Job Applications</h2>
+    <table border="1">
+        <tr>
+            <th>Laborer</th>
+            <th>Job</th>
+            <th>Company</th>
+            <th>Applied On</th>
+            <th>Status</th>
+        </tr>
+        {% for app in applications %}
+        <tr>
+            <td>{{ app['laborer_name'] }}</td>
+            <td>{{ app['job_title'] }}</td>
+            <td>{{ app['company_name'] }}</td>
+            <td>{{ app['applied_at'] }}</td>
+            <td>{{ app['status'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
+
+    <h2>Grievances</h2>
+    <table border="1">
+        <tr>
+            <th>Company</th>
+            <th>Issues</th>
+            <th>Complaint</th>
+            <th>Submitted On</th>
+            <th>Status</th>
+            <th>Admin Reply</th>
+
+
+        </tr>
+        {% for grievance in grievances %}
+        <tr>
+            <td>{{ grievance['company_name'] }}</td> <!-- Fixed typo: 'compny_name' to 'company_name' -->
+            <td>{{ grievance['issues'] }}</td>
+            <td>{{ grievance['complaint'] }}</td>
+            <td>{{ grievance['created_at'] }}</td>
+            <td>{{ 'Resolved' if grievance['resolved'] else 'Pending' }}</td>
+            <td>
+                {% if not grievance['resolved'] %}
+                <form method="POST" action="{{ url_for('admin_dashboard') }}">
+                    <input type="hidden" name="grievance_id" value="{{ grievance.id }}">
+                    <textarea name="admin_reply" rows="2" placeholder="Write a reply..." required></textarea>
+                    <button type="submit" name="submit_reply">Reply & Resolve</button>
+                </form>
+
+                <!-- Forward Grievance Form -->
+                <form method="POST" action="{{ url_for('admin_dashboard') }}">
+                    <input type="hidden" name="grievance_id" value="{{ grievance.id }}">
+                    <label for="forward_email_{{ grievance.id }}">Forward to Email:</label>
+                    <input type="email" name="forward_email" id="forward_email_{{ grievance.id }}"
+                        placeholder="example@example.com" required>
+                    <button type="submit" name="forward_grievance">Forward Grievance</button>
+                </form>
+                {% else %}
+                <span>✔️ Resolved</span>
+                {% endif %}
+            </td>
+
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Add New Scheme</h2>
+    <form method="POST" action="{{ url_for('admin_dashboard') }}">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+
+        <label for="offered_by">Offered By:</label>
+        <input type="text" id="offered_by" name="offered_by" required>
+
+        <label for="description">Description:</label>
+        <textarea id="description" name="description" rows="4" required></textarea>
+
+        <label for="registration_link">Registration Link:</label>
+        <input type="url" id="registration_link" name="registration_link">
+
+        <label for="read_more_link">Read More Link:</label>
+        <input type="url" id="read_more_link" name="read_more_link">
+
+        <label>Eligibility Criteria:</label>
+        <div id="eligibility-container">
+            <input type="text" name="eligibility[]" placeholder="Eligibility Point 1" required>
+        </div>
+        <button type="button" onclick="addEligibility()">+ Add More</button>
+
+        <button type="submit" name="add_scheme">Add Scheme</button>
+    </form>
+
+    <a href="{{ url_for('admin_logout') }}">Logout</a>
+
+    <script>
+        function addEligibility() {
+            const container = document.getElementById('eligibility-container');
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'eligibility[]';
+            input.placeholder = `Eligibility Point ${container.children.length + 1}`;
+            input.required = true;
+            container.appendChild(input);
+        }
+    </script>
+</body>
+
+</html>

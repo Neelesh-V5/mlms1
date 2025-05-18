@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='lrstyles.css') }}">
+    <style>
+        body {
+
+            margin: 0;
+            padding: 0;
+
+        }
+
+        .navbar {
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            display: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                max-height: 0;
+                overflow: hidden;
+                flex-direction: column;
+                background-color: #007bff;
+                transition: max-height 0.4s ease;
+                width: 100%;
+            }
+
+            .nav-links.show {
+                max-height: 500px;
+            }
+
+            .nav-links li {
+                padding: 10px 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+
+
+        .flash-messages {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+                {% if session.user_role == 'laborer' %}
+                <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+                <li><a href="{{ url_for('view_grievance_status') }}">Grievance Status</a></li>
+                <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+                <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+                <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+                {% else %}
+                <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
+                <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Edit Profile</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul style="list-style: none; padding: 0;">
+            {% for category, message in messages %}
+            <li
+                style="background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
+                {{ message }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" enctype="multipart/form-data" onsubmit="return confirmUpdate() && validateForm();">
+            <!-- Common fields for both laborers and employers -->
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ user['name'] }}" required>
+
+            <label for="phone">Phone No:</label>
+            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" value="{{ user['phone'] }}" required>
+
+            <label for="language">Preferred Language:</label>
+            <select id="language" name="language">
+                {% for lang in ['hindi', 'bengali', 'telugu', 'marathi', 'tamil', 'urdu'] %}
+                <option value="{{ lang }}" {% if user['language']==lang %}selected{% endif %}>{{ lang.title() }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <label for="aadhar">Aadhar No.:</label>
+            <input type="text" id="aadhar" name="aadhar" value="{{ user['aadhar'] }}" readonly>
+
+
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" value="{{ user['dob'] }}" max="" required>
+
+
+            <label>Sex:</label>
+            <div class="sex-options">
+                <input type="radio" id="male" name="sex" value="male" {% if user['sex']=='male' %}checked{% endif %}>
+                <label for="male">Male</label>
+                <input type="radio" id="female" name="sex" value="female" {% if user['sex']=='female' %}checked{% endif
+                    %}>
+                <label for="female">Female</label>
+            </div>
+
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" required>{{ user['address'] }}</textarea>
+
+            {% if role == 'laborer' %}
+            <!-- Specific fields for laborer -->
+            <label>Abilities:</label>
+            <div class="checkbox-group">
+                {% for skill in ['construction', 'plumbing', 'electrician', 'carpentry', 'painting', 'gardening',
+                'welding', 'masonry', 'mechanic', 'factory-worker'] %}
+                <div>
+                    <input type="checkbox" id="{{ skill }}" name="abilities" value="{{ skill }}" {% if skill in
+                        user['abilities'].split(',') %}checked{% endif %}>
+                    <label for="{{ skill }}">{{ skill.replace('-', ' ').title() }}</label>
+                </div>
+                {% endfor %}
+            </div>
+
+            <label for="employment_length">Length of Employment:</label>
+            <input type="number" id="employment_length" name="employment_length" value="{{ user['employment_length'] }}"
+                min="1" required>
+
+            <label for="employment_unit">Employment Unit:</label>
+            <select id="employment_unit" name="employment_unit">
+                <option value="days" {% if user['employment_unit']=='days' %}selected{% endif %}>Days</option>
+                <option value="months" {% if user['employment_unit']=='months' %}selected{% endif %}>Months</option>
+            </select>
+
+            <label for="photo">Upload New Photo:</label>
+            <input type="file" id="photo" name="photo" accept="image/*">
+            {% if user['photo'] %}
+            Current Photo: <a href="{{ url_for('uploaded_file', filename=user['photo']) }}" target="_blank">View</a>
+            {% endif %}
+
+            <label for="employment_proof">Upload New Employment Proof:</label>
+            <input type="file" id="employment_proof" name="employment_proof" accept=".pdf,image/*">
+            {% if user['employment_proof'] %}
+            <p>Current Proof: <a href="{{ url_for('uploaded_file', filename=user['employment_proof']) }}"
+                    target="_blank">View</a></p>
+            {% endif %}
+            {% endif %}
+
+            {% if role == 'employer' %}
+            <!-- Specific fields for employer -->
+
+
+            <label>Abilities Required:</label>
+            <div class="checkbox-group">
+                {% for skill in ['construction', 'plumbing', 'electrician', 'carpentry', 'painting', 'gardening',
+                'welding', 'masonry', 'mechanic', 'factory-worker'] %}
+                <div>
+                    <input type="checkbox" id="req-{{ skill }}" name="abilities-required" value="{{ skill }}" {% if
+                        skill in user['abilities_required'].split(',') %}checked{% endif %}>
+                    <label for="req-{{ skill }}">{{ skill.replace('-', ' ').title() }}</label>
+                </div>
+                {% endfor %}
+            </div>
+
+            <label for="company-name">Company Name:</label>
+            <input type="text" id="company-name" name="company_name" value="{{ user['company_name'] }}" disabled>
+
+            <label for="company-reg">Company Registration ID:</label>
+            <input type="text" id="company-reg" name="company_reg" value="{{ user['reg_id'] }}" disabled>
+            {% endif %}
+
+
+
+            <button type="submit">Update Profile</button>
+        </form>
+
+        <a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+    </div>
+
+</body>
+
+<script>
+    function confirmUpdate() {
+        return confirm("Are you sure you want to update your profile?");
+    }
+    function toggleMenu() {
+        const links = document.getElementById('nav-links');
+        const button = document.getElementById('hamburger');
+        const expanded = links.classList.toggle('show');
+        button.setAttribute('aria-expanded', expanded);
+    }
+    function validateForm() {
+    const dobInput = document.getElementById('dob').value;
+    if (!dobInput) {
+        alert('Date of birth is required.');
+        return false;
+    }
+
+    const dob = new Date(dobInput);
+    const today = new Date();
+
+    const ageDiff = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    const d = today.getDate() - dob.getDate();
+
+    let age = ageDiff;
+    if (m < 0 || (m === 0 && d < 0)) {
+        age--;
+    }
+
+    if (age < 18) {
+        alert('You must be at least 18 years old.');
+        return false;
+    }
+
+    return true;
+}
+
+</script>
+
+</html>

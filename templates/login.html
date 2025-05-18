@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="title">Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='lrstyles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            width: 350px;
+            text-align: center;
+        }
+
+        .translation {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .toggle {
+            margin-top: 15px;
+            color: #007BFF;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <select class="translation" id="language-switch">
+            <option value="en">English</option>
+            <option value="hindi">हिंदी</option>
+            <option value="tamil">தமிழ்</option>
+        </select>
+        {% if error %}
+        <div style="
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 12px 20px;
+        margin-bottom: 15px;
+        border: 1px solid #f5c6cb;
+        border-radius: 6px;
+        text-align: left;
+    ">
+            ⚠️ {{ error }}
+        </div>
+        {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message {{ 'error' if category == 'error' else 'success' }}" style="background-color: {{ 'tomato' if category == 'error' else '#d4edda' }};
+                    color: {{ '#721c24' if category == 'error' else '#155724' }};
+                    padding: 12px 20px;
+                    margin-bottom: 15px;
+                    border: 1px solid {{ '#f5c6cb' if category == 'error' else '#c3e6cb' }};
+                    border-radius: 6px;
+                    text-align: left;">
+            ⚠️ {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+
+        <h2 data-translate="title">Login</h2>
+
+        <div id="laborer-login">
+            <h2 data-translate="laborer">Migrant Laborer Login</h2>
+
+            <form action="{{ url_for('login') }}" method="POST">
+                <input type="hidden" name="user_role" value="laborer">
+                <div class="form-group">
+                    <label for="phone" data-translate="phone">Phone No / Unique ID</label>
+                    <input type="text" id="phone" name="phone" placeholder="Enter phone number or ID" required>
+                </div>
+                <div class="form-group">
+                    <label for="password" data-translate="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="login-btn" data-translate="login">Login</button>
+            </form>
+            <p>Don't have an account? <a href="{{ url_for('register_laborer') }}">Register here</a></p>
+            <p class="toggle" onclick="toggleForm()" data-translate="toggleEmployer">Employer? Click here to login</p>
+        </div>
+
+        <div id="employer-login" style="display: none;">
+            <h2 data-translate="employer">Employer Login</h2>
+
+            <form action="{{ url_for('login') }}" method="POST">
+                <input type="hidden" name="user_role" value="employer">
+                <div class="form-group">
+                    <label for="company-id" data-translate="company-id">Phone no/Unique IDse</label>
+                    <input type="text" id="company-id" name="company-id" placeholder="Enter company registration ID"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="emp-password" data-translate="password">Password</label>
+                    <input type="password" id="emp-password" name="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="login-btn" data-translate="login">Login</button>
+            </form>
+            <p>Don't have an account? <a href="{{ url_for('register_employer') }}">Register here</a></p>
+            <p class="toggle" onclick="toggleForm()" data-translate="toggleLaborer">Laborer? Click here to login</p>
+        </div>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                "title": "Login",
+                "laborer": "Migrant Laborer Login",
+                "employer": "Employer Login",
+                "phone": "Phone No / Unique ID",
+                "password": "Password",
+                "company-id": "Company Registration ID",
+                "login": "Login",
+                "toggleEmployer": "Employer? Click here to login",
+                "toggleLaborer": "Laborer? Click here to login"
+            },
+            hindi: {
+                "title": "लॉगिन",
+                "laborer": "प्रवासी श्रमिक लॉगिन",
+                "employer": "नियोक्ता लॉगिन",
+                "phone": "फोन नंबर / यूनिक आईडी",
+                "password": "पासवर्ड",
+                "company-id": "कंपनी पंजीकरण आईडी",
+                "login": "लॉगिन",
+                "toggleEmployer": "नियोक्ता? लॉगिन करने के लिए यहाँ क्लिक करें",
+                "toggleLaborer": "श्रमिक? लॉगिन करने के लिए यहाँ क्लिक करें"
+            },
+            tamil: {
+                "title": "உள்நுழைவு",
+                "laborer": "பகிரங்க தொழிலாளி உள்நுழைவு",
+                "employer": "முதலாளி உள்நுழைவு",
+                "phone": "தொலைபேசி எண் / தனிப்பட்ட அடையாளம்",
+                "password": "கடவுச்சொல்",
+                "company-id": "நிறுவன பதிவு அடையாளம்",
+                "login": "உள்நுழைய",
+                "toggleEmployer": "முதலாளி? உள்நுழைய இங்கே கிளிக் செய்யவும்",
+                "toggleLaborer": "தொழிலாளர்? உள்நுழைய இங்கே கிளிக் செய்யவும்"
+            }
+        };
+
+        function translatePage(lang) {
+            document.querySelectorAll("[data-translate]").forEach(el => {
+                el.innerText = translations[lang][el.dataset.translate];
+            });
+        }
+
+        document.getElementById("language-switch").addEventListener("change", function () {
+            translatePage(this.value);
+        });
+
+        function toggleForm() {
+            var laborerForm = document.getElementById("laborer-login");
+            var employerForm = document.getElementById("employer-login");
+            if (laborerForm.style.display === "none") {
+                laborerForm.style.display = "block";
+                employerForm.style.display = "none";
+            } else {
+                laborerForm.style.display = "none";
+                employerForm.style.display = "block";
+            }
+        }
+    </script>
+</body>
+
+</html>

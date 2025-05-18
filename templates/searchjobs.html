@@ -1,0 +1,378 @@
+<!-- search_jobs.html (Updated Navbar) -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            display: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                max-height: 0;
+                overflow: hidden;
+                flex-direction: column;
+                background-color: #007bff;
+                transition: max-height 0.4s ease;
+                width: 100%;
+            }
+
+            .nav-links.show {
+                max-height: 500px;
+            }
+
+            .nav-links li {
+                padding: 10px 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        /* Flash Messages (Now Below Navbar) */
+        .flash-container {
+            max-width: 750px;
+            margin: 20px auto;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .flash-message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .flash-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-group input {
+            width: 85%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1.5px solid #ccc;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            background-color: white;
+            border-color: #007bff;
+            box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .job-listings {
+            margin-top: 30px;
+        }
+
+        .job-listing {
+            background-color: #e3f7fb;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .job-listing:hover {
+            transform: scale(1.01);
+        }
+
+        .job-listing h3 {
+            margin-top: 0;
+            color: #007bff;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .job-listing p {
+            margin: 5px 0;
+            font-size: 15px;
+        }
+
+        .apply-link {
+            display: inline-block;
+            margin-top: 12px;
+            margin-right: 10px;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 18px;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .apply-link:hover {
+            background-color: #0056b3;
+        }
+
+        .apply-link:nth-of-type(2) {
+            background-color: #28a745;
+        }
+
+        .apply-link:nth-of-type(2):hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+                {% if session.user_role == 'laborer' %}
+                <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+                <li><a href="{{ url_for('view_grievance_status') }}">Grievance Status</a></li>
+                <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+                <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+                <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+                {% else %}
+                <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
+                <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="flash-container"></div>
+
+    <div class="container">
+        <h1>Search for Jobs</h1>
+        <form id="search-form">
+            <div class="form-group">
+                <label for="job-title">Type of Job</label>
+                <input type="text" id="job-title" name="job-title" placeholder="Enter job title">
+            </div>
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="Enter location">
+            </div>
+            <div class="form-group">
+                <label for="start-date">Starts on or after</label>
+                <input type="date" id="start-date" name="start-date">
+            </div>
+            <div class="form-group">
+                <label for="end-date">Ends on or before</label>
+                <input type="date" id="end-date" name="end-date">
+            </div>
+            <div class="form-group date-group">
+                <label for="work-start">Work Start Time</label>
+                <input type="time" id="work-start" name="work-start">
+            </div>
+            <div class="form-group date-group">
+                <label for="work-end">Work End Time</label>
+                <input type="time" id="work-end" name="work-end">
+            </div>
+            <div class="button-group">
+                <button type="button" id="clear-button">Clear</button>
+                <button type="submit">Search</button>
+            </div>
+        </form>
+
+        <h2>Available Jobs</h2>
+        <div class="job-listings"></div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const links = document.getElementById('nav-links');
+            const button = document.getElementById('hamburger');
+            const expanded = links.classList.toggle('show');
+            button.setAttribute('aria-expanded', expanded);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const flashContainer = document.querySelector(".flash-container");
+            const searchForm = document.getElementById("search-form");
+            const jobListingsContainer = document.querySelector(".job-listings");
+
+            function fetchAllJobs() {
+                fetch("{{ url_for('search_jobs') }}", {
+                    method: "POST",
+                    body: new FormData(),
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        flashContainer.innerHTML = "";
+                        data.flash_messages.forEach(([category, message]) => showFlashMessage(category, message));
+                        displayJobs(data.jobs);
+                    })
+                    .catch(error => console.error("Error fetching jobs:", error));
+            }
+
+            function displayJobs(jobs) {
+                jobListingsContainer.innerHTML = jobs.length
+                    ? jobs.map(job => `
+                    <div class="job-listing">
+                        <h3>${job.job_title}</h3>
+                        <p><strong>Company:</strong> ${job.company_name || "N/A"}</p>
+                        <p><strong>Location:</strong> ${job.location || "N/A"}</p>
+                        <p><strong>Salary:</strong> ₹${job.salary || "N/A"}</p>
+                        <p><strong>Work Duration:</strong> ${job.duration_start || "N/A"} - ${job.duration_end || "N/A"}</p>
+                        <p><strong>Work Timings:</strong> ${job.work_start || "N/A"} - ${job.work_end || "N/A"}</p>
+                        <p><strong>Description:</strong> ${job.description || "No description available"}</p>
+                        <a class="apply-link" href="/apply/${job.id}">Apply Now</a>
+                        <a class="apply-link" href="/contact_employer/${job.id}" style="background-color: #28a745;">Contact Employer</a>
+                    </div>
+                `).join("")
+                    : "<p>No jobs available at the moment.</p>";
+            }
+
+            fetchAllJobs();
+
+            document.getElementById("clear-button").addEventListener("click", function () {
+                searchForm.reset();
+                fetchAllJobs();
+            });
+
+            searchForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+                let formData = new FormData(searchForm);
+                let isEmpty = true;
+
+                for (let value of formData.values()) {
+                    if (value.trim() !== "") {
+                        isEmpty = false;
+                        break;
+                    }
+                }
+
+                if (isEmpty) {
+                    showFlashMessage("error", "Please provide at least one search parameter.");
+                    return;
+                }
+
+                fetch("{{ url_for('search_jobs') }}", {
+                    method: "POST",
+                    body: formData,
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        flashContainer.innerHTML = "";
+                        data.flash_messages.forEach(([category, message]) => showFlashMessage(category, message));
+                        displayJobs(data.jobs);
+                    })
+                    .catch(error => console.error("Error searching jobs:", error));
+            });
+
+            function showFlashMessage(category, message) {
+                let flashDiv = document.createElement("div");
+                flashDiv.classList.add("flash-message", category);
+                flashDiv.textContent = message;
+                flashContainer.appendChild(flashDiv);
+                setTimeout(() => flashDiv.remove(), 5000);
+            }
+        });
+    </script>
+</body>
+
+</html>

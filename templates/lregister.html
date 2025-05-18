@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laborer Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='lrstyles.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Laborer Registration</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message {{ 'error' if category == 'error' else 'success' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form action="/register/laborer" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="phone">Phone No:</label>
+            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number"
+                required>
+
+            <label for="language">Preferred Language:</label>
+            <select id="language" name="language">
+                <option value="hindi">Hindi</option>
+                <option value="bengali">Bengali</option>
+                <option value="telugu">Telugu</option>
+                <option value="marathi">Marathi</option>
+                <option value="tamil">Tamil</option>
+                <option value="urdu">Urdu</option>
+            </select>
+
+            <label for="aadhar">Aadhar No.:</label>
+            <input type="text" id="aadhar" name="aadhar" pattern="[0-9]{12}"
+                title="Enter a valid 12-digit Aadhar number" required>
+
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+
+            <label>Sex:</label>
+            <div class="sex-options">
+                <input type="radio" id="male" name="sex" value="male" required>
+                <label for="male">Male</label>
+                <input type="radio" id="female" name="sex" value="female" required>
+                <label for="female">Female</label>
+            </div>
+
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" required></textarea>
+
+            <label>Abilities:</label>
+            <div class="checkbox-group">
+                {% for ability in ['construction', 'plumbing', 'electrician', 'carpentry', 'painting', 'gardening',
+                'welding', 'masonry', 'mechanic', 'factory-worker'] %}
+                <div>
+                    <input type="checkbox" id="{{ ability }}" name="abilities" value="{{ ability }}">
+                    <label for="{{ ability }}">{{ ability.replace('-', ' ').title() }}</label>
+                </div>
+                {% endfor %}
+            </div>
+
+
+
+            <label for="employment-length">Length of Employment:</label>
+            <input type="number" id="employment-length" name="employment-length" min="1" required>
+            <select id="employment-unit" name="employment-unit">
+                <option value="days">Days</option>
+                <option value="months">Months</option>
+            </select>
+
+            <label for="photo">Upload Photo:</label>
+            <input type="file" id="photo" name="photo" accept="image/*" required>
+
+            <label for="employment-proof">Proof of Employment:</label>
+            <input type="file" id="employment-proof" name="employment-proof" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="confirm-password">Confirm Password:</label>
+            <input type="password" id="confirm-password" name="confirm-password" required>
+
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+
+    <script>
+        function validateForm() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return false;
+            }
+
+            const dobInput = document.getElementById('dob').value;
+            if (!dobInput) {
+                alert('Date of birth is required.');
+                return false;
+            }
+
+            const dob = new Date(dobInput);
+            const today = new Date();
+
+            const ageDiff = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            const d = today.getDate() - dob.getDate();
+
+            let age = ageDiff;
+            if (m < 0 || (m === 0 && d < 0)) {
+                age--;
+            }
+
+            if (age < 18) {
+                alert('You must be at least 18 years old to register.');
+                return false;
+            }
+
+            return true;
+        }
+
+    </script>
+
+</body>
+
+</html>

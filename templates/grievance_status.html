@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grievance Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            display: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                max-height: 0;
+                overflow: hidden;
+                flex-direction: column;
+                background-color: #007bff;
+                transition: max-height 0.4s ease;
+                width: 100%;
+            }
+
+            .nav-links.show {
+                max-height: 500px;
+            }
+
+            .nav-links li {
+                padding: 10px 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        .grievance {
+            background: #eef5ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .grievance h3 {
+            margin: 0 0 8px;
+            color: #0056b3;
+        }
+
+        .grievance p {
+            margin: 5px 0;
+            font-size: 15px;
+        }
+
+        .status-resolved {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+
+        .flash-messages div {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .flash-messages .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .flash-messages .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ✅ Navbar -->
+<nav class="navbar">
+    <div class="navbar-container">
+        <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+            <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+            <li><a href="{{ url_for('view_grievance_status') }}">Grievance Status</a></li>
+            <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+            <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+            <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Your Grievance Submissions</h1>
+
+    <!-- ✅ Flash Messages -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    {% if grievances %}
+        {% for g in grievances %}
+        <div class="grievance">
+            <h3>{{ g.company_name }}</h3>
+            <p><strong>Issues:</strong> {{ g.issues }}</p>
+            <p><strong>Complaint:</strong> {{ g.complaint }}</p>
+            <p><strong>Status:</strong>
+                {% if g.resolved %}<span class="status-resolved">Resolved</span>
+                {% else %}<span class="status-pending">Pending</span>{% endif %}
+            </p>
+            <p><strong>Admin Reply:</strong> {{ g.admin_reply if g.admin_reply else "No reply yet" }}</p>
+            <p><em>Submitted on: {{ g.created_at }}</em></p>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p>You haven't submitted any grievances yet.</p>
+    {% endif %}
+</div>
+
+<script>
+    function toggleMenu() {
+        const links = document.getElementById('nav-links');
+        const button = document.getElementById('hamburger');
+        const expanded = links.classList.toggle('show');
+        button.setAttribute('aria-expanded', expanded);
+    }
+</script>
+
+</body>
+</html>

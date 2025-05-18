@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grievance Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    .navbar {
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            display: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                max-height: 0;
+                overflow: hidden;
+                flex-direction: column;
+                background-color: #007bff;
+                transition: max-height 0.4s ease;
+                width: 100%;
+            }
+
+            .nav-links.show {
+                max-height: 500px;
+            }
+
+            .nav-links li {
+                padding: 10px 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: 50px auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input,
+    textarea,
+    .container select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .inline-group {
+      display: flex;
+      gap: 20px;
+    }
+
+    .inline-group .form-group {
+      flex: 1;
+    }
+
+    .salary-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .salary-group span {
+      font-size: 18px;
+    }
+
+    .salary-group input {
+      flex: 1;
+    }
+
+    .post-btn {
+      width: 100%;
+      padding: 12px;
+      background: green;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .post-btn:hover {
+      background: darkgreen;
+    }
+
+    @media (max-width: 600px) {
+      .inline-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+        <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+            {% if session.user_role == 'laborer' %}
+            <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+            <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+            <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+            <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+            {% else %}
+            <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
+            <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+  <div class="container">
+    <h2>Post Your Job</h2>
+    <form action="{{ url_for('offer_job') }}" method="POST">
+      <div class="form-group">
+        <label for="title">Job Title</label>
+        <input type="text" id="title" name="title" placeholder="Enter job title" required />
+      </div>
+
+      <div class="form-group">
+        <label for="location">Location</label>
+        <input type="text" id="location" name="location" placeholder="Enter job location" required />
+      </div>
+
+      <div class="inline-group">
+        <div class="form-group">
+          <label for="work-start">Working Hours (Start)</label>
+          <input type="time" id="work-start" name="work-start" required />
+        </div>
+        <div class="form-group">
+          <label for="work-end">Ends at</label>
+          <input type="time" id="work-end" name="work-end" required />
+        </div>
+      </div>
+
+      <div class="inline-group">
+        <div class="form-group">
+          <label for="duration-start">Duration of Work (Start)</label>
+          <input type="date" id="duration-start" name="duration-start" required />
+        </div>
+        <div class="form-group">
+          <label for="duration-end">Ends at</label>
+          <input type="date" id="duration-end" name="duration-end" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Job Description</label>
+        <textarea id="description" name="description" rows="4" placeholder="Describe the job..." required></textarea>
+      </div>
+
+      <div class="form-group salary-group">
+        <label for="salary">Salary</label>
+        <span>₹</span>
+        <input type="number" id="salary" name="salary" placeholder="Enter salary" required />
+      </div>
+
+      <button type="submit" class="post-btn">Post</button>
+    </form>
+  </div>
+</body>
+<script>
+  function toggleMenu() {
+    const links = document.getElementById('nav-links');
+    const button = document.getElementById('hamburger');
+    const expanded = links.classList.toggle('show');
+    button.setAttribute('aria-expanded', expanded);
+  }
+  document.querySelector('form').addEventListener('submit', function (event) {
+    const startDateStr = document.getElementById('duration-start').value;
+    const endDateStr = document.getElementById('duration-end').value;
+    const startTimeStr = document.getElementById('work-start').value;
+    const endTimeStr = document.getElementById('work-end').value;
+
+    if (!startDateStr || !endDateStr || !startTimeStr || !endTimeStr) {
+      alert("Please fill in all date and time fields.");
+      event.preventDefault();
+      return;
+    }
+
+    // DATE validation
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+
+    if (startDate < today || endDate < today) {
+      alert("Start and end dates must not be before today.");
+      event.preventDefault();
+      return;
+    }
+
+    if (endDate < startDate) {
+      alert("End date cannot be before start date.");
+      event.preventDefault();
+      return;
+    }
+
+    // TIME validation
+    const [startHour, startMin] = startTimeStr.split(":").map(Number);
+    const [endHour, endMin] = endTimeStr.split(":").map(Number);
+
+    const startTime = startHour * 60 + startMin;
+    const endTime = endHour * 60 + endMin;
+
+    if (endTime <= startTime) {
+      alert("Work end time must be after work start time.");
+      event.preventDefault();
+    }
+  });
+</script>
+
+</html>

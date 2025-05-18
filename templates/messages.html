@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Messages</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            display: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                max-height: 0;
+                overflow: hidden;
+                flex-direction: column;
+                background-color: #007bff;
+                transition: max-height 0.4s ease;
+                width: 100%;
+            }
+
+            .nav-links.show {
+                max-height: 500px;
+            }
+
+            .nav-links li {
+                padding: 10px 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        .chat-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 80px);
+            background: #fff;
+        }
+
+        .sidebar {
+            width: 300px;
+            border-right: 1px solid #ccc;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        .conversation-header {
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            background-color: #f1f1f1;
+            transition: background 0.2s;
+        }
+
+        .conversation-header:hover {
+            background-color: #e2e2e2;
+        }
+
+        .conversation-header h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .conversation-header p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .chat-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .message-box {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            padding: 10px 14px;
+            border-radius: 16px;
+            margin-bottom: 10px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .sent {
+            background-color: #d4f8d4;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .received {
+            background-color: #ffe2e2;
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .message small {
+            display: block;
+            font-size: 11px;
+            margin-top: 4px;
+            color: #777;
+        }
+
+        .message-input {
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid #ccc;
+            padding-top: 1rem;
+        }
+
+        .message-input textarea {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            resize: none;
+            font-size: 14px;
+        }
+
+        .message-input button {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .message-input button:hover {
+            background-color: #0056b3;
+        }
+
+        .conversation-header.active {
+            background-color: #cce5ff;
+        }
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        let conversations = {{ conversations | tojson }};
+        let userType = "{{ user_type }}";
+
+        let activeConversationId = null;
+
+        function loadConversation(conversationId) {
+            const headers = document.querySelectorAll('.conversation-header');
+
+            if (activeConversationId === conversationId) {
+                // Deselect current conversation
+                activeConversationId = null;
+                document.getElementById("chat-box").innerHTML = `
+            <h2>Select a conversation</h2>
+            <p class="job-title"></p>
+            <p class="company-name"></p>
+            <div class="message-box" id="message-box"></div>
+            <form onsubmit="sendMessage(event)" id="input-area" class="message-input" data-conversation-id="">
+                <textarea id="msg-input" placeholder="Type your message..." required></textarea>
+                <button type="submit">Send</button>
+            </form>
+        `;
+
+                headers.forEach(header => header.classList.remove("active"));
+                return;
+            }
+
+            // Update activeConversationId
+            activeConversationId = conversationId;
+
+            // Highlight the selected header
+            headers.forEach(header => header.classList.remove("active"));
+            document.querySelector(`.conversation-header[onclick*="${conversationId}"]`).classList.add("active");
+
+            // Load conversation content
+            const convo = conversations[conversationId];
+            const box = document.getElementById("chat-box");
+
+            box.innerHTML = `
+    <h2>Conversation with ${convo.participants}</h2>
+    ${convo.job_title ? `<p><strong>Job:</strong> ${convo.job_title}</p>` : ''}
+    ${convo.company_name ? `<p><strong>Company:</strong> ${convo.company_name}</p>` : ''}
+    ${convo.application_id ? `<p><strong>Application ID:</strong> ${convo.application_id}</p>` : ''}
+    <div class="message-box" id="message-box"></div>
+    <form onsubmit="sendMessage(event)" id="input-area" class="message-input" data-conversation-id="${conversationId}">
+        <textarea id="msg-input" placeholder="Type your message..." required></textarea>
+        <button type="submit">Send</button>
+    </form>
+`;
+
+
+            const messageBox = document.getElementById("message-box");
+            [...convo.messages].reverse().forEach(msg => {
+                const div = document.createElement("div");
+                div.className = "message " + (msg.sender_type === userType ? "sent" : "received");
+                div.innerHTML = `${msg.message}<small>${msg.sender_type} – ${msg.timestamp}</small>`;
+                messageBox.appendChild(div);
+            });
+
+            messageBox.scrollTop = messageBox.scrollHeight;
+        }
+
+
+        function sendMessage(event) {
+            event.preventDefault();
+
+            const conversationId = event.target.dataset.conversationId;
+            const textarea = document.getElementById("msg-input");
+            const message = textarea.value.trim();
+            if (!message) return;
+
+            textarea.value = '';
+
+            $.ajax({
+                url: `/send_message/${conversationId}`,
+                type: 'POST',
+                data: { message },
+                success: function (response) {
+                    const newMessage = `<div class="message ${response.sender_type === 'laborer' ? 'sent' : 'received'}">
+                        ${response.message}<small>${response.sender_type} – ${response.timestamp}</small>
+                    </div>`;
+                    $('#message-box').append(newMessage);
+                    $('#message-box').scrollTop($('#message-box')[0].scrollHeight);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Message sending error:", status, error);
+                    alert("Could not send message.");
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+                {% if session.user_role == 'laborer' %}
+                <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+                <li><a href="{{ url_for('view_grievance_status') }}">Grievance Status</a></li>
+                <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+                <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+                <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+                {% else %}
+                <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
+                <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="chat-container">
+        <div class="sidebar">
+            {% for conversation_id, convo in conversations.items() %}
+            <div class="conversation-header" onclick="loadConversation('{{ conversation_id }}')">
+                <h2>{{ convo.participants }}</h2>
+                <p>{{ convo.job_title }}</p>
+                <p>{{ convo.company_name }}</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="chat-box" id="chat-box">
+            <h2>Select a conversation</h2>
+            <p class="job-title"></p>
+            <p class="company-name"></p>
+
+            <div class="message-box" id="message-box"></div>
+
+            <form onsubmit="sendMessage(event)" id="input-area" class="message-input" data-conversation-id="">
+                <textarea id="msg-input" placeholder="Type your message..." required></textarea>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+</body>
+<script>
+    function toggleMenu() {
+        const links = document.getElementById('nav-links');
+        const button = document.getElementById('hamburger');
+        const expanded = links.classList.toggle('show');
+        button.setAttribute('aria-expanded', expanded);
+    }
+</script>
+</html>

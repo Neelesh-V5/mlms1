@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="{{ url_for('serve_static', filename='styles.css') }}">
+</head>
+<body>
+ 
+
+    <h1>Admin Login</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash-message {{ category }}"
+             style="background-color: {{ 'tomato' if category == 'error' else '#d4edda' }};
+                    color: {{ '#721c24' if category == 'error' else '#155724' }};
+                    padding: 10px;
+                    margin: 15px auto;
+                    border: 1px solid {{ '#f5c6cb' if category == 'error' else '#c3e6cb' }};
+                    border-radius: 5px;
+                    max-width:250px;
+                    text-align:center;">
+          ⚠️ {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+    <form method="POST" action="{{ url_for('admin_login') }}">
+        <label for="username">Username:</label>
+        <input type="text" name="username" required>
+        
+        <label for="password">Password:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>

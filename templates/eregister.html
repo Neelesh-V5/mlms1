@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employer Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='lrstyles.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>Employer Registration</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message {{ 'error' if category == 'error' else 'success' }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <form action="{{ url_for('register_employer') }}" method="POST" onsubmit="return validateForm()"
+            enctype="multipart/form-data">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" pattern="[0-9]{10}"
+                title="Enter a valid 10-digit phone number" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email"
+                pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                title="Enter a valid email address (e.g., example@mail.com)" required>
+
+            <label for="language">Preferred Language:</label>
+            <select id="language" name="language">
+                <option value="hindi">Hindi</option>
+                <option value="bengali">Bengali</option>
+                <option value="telugu">Telugu</option>
+                <option value="marathi">Marathi</option>
+                <option value="tamil">Tamil</option>
+                <option value="urdu">Urdu</option>
+            </select>
+
+            <label for="aadhar">Aadhar:</label>
+            <input type="text" id="aadhar" name="aadhar" placeholder="Enter your Aadhar number" pattern="[0-9]{12}"
+                title="Enter a valid 12-digit Aadhar number" required>
+
+            <label for="dob">Date of Birth:</label>
+            <input type="date" id="dob" name="dob" required>
+
+            <label for="sex">Gender:</label>
+            <select id="sex" name="sex" required>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" placeholder="Enter your address" required></textarea>
+
+            <label for="company-name">Company Name:</label>
+            <input type="text" id="company-name" name="company-name" placeholder="Enter company name" required>
+            <label for="license_image">Upload License Image:</label>
+            <input type="file" name="license_image" id="license_image" accept=".jpg,.jpeg,.png,.pdf" required>
+
+            <label>Abilities Required:</label>
+            <div class="checkbox-group">
+                {% for ability in ['construction', 'plumbing', 'electrician', 'carpentry', 'painting', 'gardening',
+                'welding', 'masonry', 'mechanic', 'factory-worker'] %}
+                <div>
+                    <input type="checkbox" id="req-{{ ability }}" name="abilities-required" value="{{ ability }}">
+                    <label for="req-{{ ability }}">{{ ability.replace('-', ' ').title() }}</label>
+                </div>
+                {% endfor %}
+            </div>
+
+
+
+            <label for="company-reg">Company Registration ID:</label>
+            <input type="text" id="company-reg" name="company-reg" placeholder="Company ID" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter password" required>
+
+            <label for="confirm-password">Confirm Password:</label>
+            <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm password"
+                required>
+
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+
+    <script>
+        function validateForm() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return false;
+            }
+
+            const dobInput = document.getElementById('dob').value;
+            if (!dobInput) {
+                alert('Date of birth is required.');
+                return false;
+            }
+
+            const dob = new Date(dobInput);
+            const today = new Date();
+
+            const ageDiff = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            const d = today.getDate() - dob.getDate();
+
+            let age = ageDiff;
+            if (m < 0 || (m === 0 && d < 0)) {
+                age--;
+            }
+
+            if (age < 18) {
+                alert('You must be at least 18 years old to register.');
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+
+</body>
+
+</html>

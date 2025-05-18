@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grievance Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .navbar {
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            display: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                max-height: 0;
+                overflow: hidden;
+                flex-direction: column;
+                background-color: #007bff;
+                transition: max-height 0.4s ease;
+                width: 100%;
+            }
+
+            .nav-links.show {
+                max-height: 500px;
+            }
+
+            .nav-links li {
+                padding: 10px 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        select, input, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .checkbox-group input {
+            width: auto;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .success {
+            color: green;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash-messages div {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .flash-messages .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .flash-messages .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ✅ Navbar -->
+<nav class="navbar">
+    <div class="navbar-container">
+        <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+            {% if session.user_role == 'laborer' %}
+            <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+            <li><a href="{{ url_for('view_grievance_status') }}">Grievance Status</a></li>
+            <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+            <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+            <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+            {% else %}
+            <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
+            <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Grievance Submission</h1>
+
+    <!-- ✅ Display Flash Messages -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <form action="{{ url_for('grievance') }}" method="POST" onsubmit="return validateForm()">
+        
+        <!-- ✅ Select Company -->
+        <label for="company">Company:</label>
+        <select id="company" name="company" required>
+            <option value="">Select Company</option>
+            {% for company in companies %}
+                <option value="{{ company.id }}">{{ company.name }}</option>
+            {% endfor %}
+        </select>
+        <div id="company-error" class="error"></div>
+
+        <!-- ✅ Grievance Issues -->
+        <label>Select all that apply:</label>
+        <div class="checkbox-group">
+            <label><input type="checkbox" name="issues" value="Mistreatment"> Mistreatment</label>
+            <label><input type="checkbox" name="issues" value="Salary Issues"> Salary Issues</label>
+            <label><input type="checkbox" name="issues" value="Working Hours"> Working Hours</label>
+            <label><input type="checkbox" name="issues" value="No Compensation"> No Compensation</label>
+            <label><input type="checkbox" name="issues" value="Other"> Other</label>
+        </div>
+        <div id="issues-error" class="error"></div>
+
+        <!-- ✅ Complaint Field -->
+        <label for="complaint">Complaint:</label>
+        <textarea id="complaint" name="complaint" rows="4" required></textarea>
+        <div id="complaint-error" class="error"></div>
+
+        <!-- ✅ Submit Button -->
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<script>
+    function toggleMenu() {
+        const links = document.getElementById('nav-links');
+        const button = document.getElementById('hamburger');
+        const expanded = links.classList.toggle('show');
+        button.setAttribute('aria-expanded', expanded);
+    }
+    // ✅ Client-side form validation
+    function validateForm() {
+        let isValid = true;
+
+        const company = document.getElementById('company').value;
+        const complaint = document.getElementById('complaint').value;
+        const issues = document.querySelectorAll('input[name="issues"]:checked');
+
+        // Clear previous error messages
+        document.getElementById('company-error').textContent = '';
+        document.getElementById('issues-error').textContent = '';
+        document.getElementById('complaint-error').textContent = '';
+
+        // Company validation
+        if (!company) {
+            document.getElementById('company-error').textContent = 'Please select a company.';
+            isValid = false;
+        }
+
+        // Issues validation
+        if (issues.length === 0) {
+            document.getElementById('issues-error').textContent = 'Please select at least one grievance issue.';
+            isValid = false;
+        }
+
+        // Complaint validation
+        if (!complaint.trim()) {
+            document.getElementById('complaint-error').textContent = 'Complaint field cannot be empty.';
+            isValid = false;
+        }
+
+        return isValid;
+    }
+</script>
+
+</body>
+</html>

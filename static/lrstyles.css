@@ -1,0 +1,74 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    text-align: left;
+    width: 50%;
+    max-width: 440px;
+    margin:  60px;
+}
+
+h2 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-top: 10px;
+}
+
+input, select, textarea {
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    max-width: fit-content;
+    margin: 24px auto;
+}
+
+
+button:hover {
+    background-color: #218838;
+}
+
+
+.flash-message {
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.flash-message.error {
+    color: red;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+}
+
+.flash-message.success {
+    color: green;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+}

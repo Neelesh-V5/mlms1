@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Employer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        .job-details {
+            background-color: #e9f5ff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        textarea {
+            width: 90%;
+            height: 100px;
+            border-radius: 5px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+
+        .navbar ul li {
+            margin-right: 20px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+            {% if session.user_role == 'laborer' %}
+            <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+            <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+            <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+            <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+            {% else %}
+            <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
+            <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+        <select id="language-switch">
+            <option value="en">English</option>
+            <option value="hindi">Hindi</option>
+            <option value="marathi">Marathi</option>
+        </select>
+    </nav>
+<div class="container">
+    <h1>Contact Employer</h1>
+
+    <div class="job-details">
+        <h2>{{ job['job_title'] }}</h2>
+        <p><strong>Company:</strong> {{ job['company_id'] }}</p>
+        <p><strong>Description:</strong> {{ job['description'] }}</p>
+        <p><strong>Salary:</strong> ₹{{ job['salary'] }}</p>
+        <p><strong>Employer Name:</strong> {{ job['name'] }}</p>
+        <p><strong>Phone:</strong> {{ job['phone'] }}</p>
+        <p><strong>Email:</strong> <a href="mailto:{{ job['email'] }}">{{ job['email'] }}</a></p>
+    </div>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="message">Your Message:</label>
+            <textarea id="message" name="message" required placeholder="Write a message to the employer..."></textarea>
+        </div>
+        <button type="submit">Send Message</button>
+    </form>
+</div>
+
+</body>
+</html>

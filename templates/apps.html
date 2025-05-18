@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Applications</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            display: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                max-height: 0;
+                overflow: hidden;
+                flex-direction: column;
+                background-color: #007bff;
+                transition: max-height 0.4s ease;
+                width: 100%;
+            }
+
+            .nav-links.show {
+                max-height: 500px;
+            }
+
+            .nav-links li {
+                padding: 10px 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .job-group {
+            margin-bottom: 30px;
+        }
+
+        .application-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .applicant-info {
+            flex: 1;
+        }
+
+        .contact-info {
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .accept-btn,
+        .reject-btn,
+        .message-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
+            width: 150px;
+        }
+
+        .accept-btn {
+            background: green;
+        }
+
+        .reject-btn {
+            background: red;
+        }
+
+        .message-btn {
+            background: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+                {% if session.user_role == 'laborer' %}
+                <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+                <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+                <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+                <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+                {% else %}
+                <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
+                <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>View Job Applications</h2>
+        <input type="text" class="search-box" placeholder="Search applications..." onkeyup="filterApplications()">
+
+        {% for job_title, applications in grouped_applications.items() %}
+        <div class="job-group">
+            <h3>{{ job_title }}</h3>
+            {% for app in applications[::-1] %}
+            <div class="application-card">
+                <div class="applicant-info">
+                    <strong>{{ app['laborer_name'] }}</strong><br>
+                    Job: {{ app['job_title'] }}<br>
+                    Location: {{ app['location'] }}<br>
+                    Skills: {{ app['skills'] }}
+                </div>
+                <div class="contact-info">
+                    <strong>Contact</strong><br>
+                    Phone: {{ app['contact'] }}<br>
+                    Status: <strong>{{ app['status'] }}</strong>
+                </div>
+                {% if app['status'] == 'Pending' %}
+                <div class="actions">
+                    <button class="accept-btn"
+                        onclick="updateApplication('{{ app.application_id }}', 'Accepted')">Accept</button>
+                    <button class="reject-btn"
+                        onclick="updateApplication('{{ app.application_id }}', 'Rejected')">Reject</button>
+                    <button class="message-btn" onclick="messageLaborer('{{ app.application_id }}')">Message</button>
+                </div>
+                {% endif %}
+
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function toggleMenu() {
+        const links = document.getElementById('nav-links');
+        const button = document.getElementById('hamburger');
+        const expanded = links.classList.toggle('show');
+        button.setAttribute('aria-expanded', expanded);
+    }
+        function updateApplication(applicationId, status) {
+            fetch("/update_application", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ application_id: applicationId, status: status })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    location.reload(); // Refresh page to update status
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        function messageLaborer(applicationId) {
+            window.location.href = `/contact_laborer/${applicationId}`; // Redirect to contact laborer page based on application_id
+        }
+
+        function filterApplications() {
+            let input = document.querySelector(".search-box").value.toLowerCase();
+            let cards = document.querySelectorAll(".application-card");
+
+            cards.forEach(card => {
+                let name = card.querySelector(".applicant-info strong").innerText.toLowerCase();
+                let job = card.querySelector(".applicant-info").innerText.toLowerCase();
+                if (name.includes(input) || job.includes(input)) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

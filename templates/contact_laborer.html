@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Laborer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+
+        .navbar ul li {
+            margin-right: 20px;
+        }
+
+        .navbar a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .message-box {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .message-btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .message-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+            {% if session.user_role == 'laborer' %}
+            <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+            <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+            <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+            <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+            {% else %}
+            <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
+            <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h2>Contact Laborer for Job: {{ job.job_title }}</h2>
+        <form method="POST">
+            <div>
+                <label for="message">Message</label>
+                <textarea id="message" name="message" class="message-box" rows="4" placeholder="Write your message here..."></textarea>
+            </div>
+            <button type="submit" class="message-btn">Send Message</button>
+        </form>
+    </div>
+</body>
+
+</html>

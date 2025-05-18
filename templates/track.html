@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Application Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .navbar {
+            background-color: #007bff;
+            padding: 1rem;
+            color: white;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        .hamburger {
+            font-size: 26px;
+            cursor: pointer;
+            display: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                max-height: 0;
+                overflow: hidden;
+                flex-direction: column;
+                background-color: #007bff;
+                transition: max-height 0.4s ease;
+                width: 100%;
+            }
+
+            .nav-links.show {
+                max-height: 500px;
+            }
+
+            .nav-links li {
+                padding: 10px 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .job-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 60%;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .job-info {
+            flex-grow: 1;
+        }
+
+        .job-info h3 {
+            margin: 0 0 10px 0;
+        }
+
+        .job-info p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .remove-btn:hover {
+            background-color: #c82333;
+        }
+
+        .successful-jobs,
+        .unsuccessful-jobs,
+        .pending-jobs {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            width: 70%;
+            margin: auto;
+        }
+
+        .successful-jobs h2,
+        .unsuccessful-jobs h2,
+        .pending-jobs h2 {
+            text-align: center;
+        }
+
+        .company-contact {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .successful-jobs .company-contact {
+            background: #77DD77;
+        }
+
+        .unsuccessful-jobs .company-contact {
+            background: #FFE4E1;
+        }
+
+        .pending-jobs .company-contact {
+            background: #FFDD57;
+        }
+
+        .company-contact:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+                {% if session.user_role == 'laborer' %}
+                <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
+                <li><a href="{{ url_for('view_grievance_status') }}">Grievance Status</a></li>
+                <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
+                <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
+                <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+                {% else %}
+                <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
+                <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+                {% endif %}
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>My Job Applications</h1>
+
+        <div class="pending-jobs">
+            <h2>Pending Applications</h2>
+            {% for job in pending_apps %}
+            <div class="job-card">
+                <div class="job-info">
+                    <h3>{{ job.job_title }}</h3>
+                    <p><strong>Company:</strong> {{ job.company_name }}</p>
+                    <p><strong>Location:</strong> {{ job.location }}</p>
+                    <p><strong>Duration:</strong> {{job.duration_start}} to {{job.duration_end}}</p>
+                    <p><strong>Date Applied:</strong> {{ job.applied_at }}</p>
+                    <p><strong>Status:</strong> {{ job.status }}</p>
+                    <a href="{{ url_for('contact_employer', job_id=job.job_id) }}">
+                        <button class="remove-btn" style="background-color: #28a745; margin-top: 10px;">
+                            Contact Employer
+                        </button>
+                    </a>
+
+
+                </div>
+                <button class="remove-btn" onclick="removeApplication('{{ job.application_id }}')">Remove</button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="successful-jobs">
+            <h2>Successful Applications</h2>
+            {% for job in successful_apps %}
+            <div class="company-contact">
+                <h3>{{ job.job_title }}</h3>
+                <p><strong>Company:</strong> {{ job.company_name }}</p>
+                <p><strong>Location:</strong> {{ job.location }}</p>
+                <p><strong>Duration:</strong> {{job.duration_start}} to {{job.duration_end}}</p>
+
+                <p><strong>Date Applied:</strong> {{ job.applied_at }}</p>
+                <p><strong>Status:</strong> {{ job.status }}</p>
+                                    <a href="{{ url_for('contact_employer', job_id=job.job_id) }}">
+                        <button class="remove-btn" style="background-color: #28a745; margin-top: 10px;">
+                            Contact Employer
+                        </button>
+                    </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="unsuccessful-jobs">
+            <h2>Unsuccessful Applications</h2>
+            {% for job in unsuccessful_apps %}
+            <div class="company-contact">
+                <h3>{{ job.job_title }}</h3>
+                <p><strong>Company:</strong> {{ job.company_name }}</p>
+                <p><strong>Location:</strong> {{ job.location }}</p>
+                <p><strong>Duration:</strong> {{job.duration_start}} to {{job.duration_end}}</p>
+                <p><strong>Date Applied:</strong> {{ job.applied_at }}</p>
+                <p><strong>Status:</strong> {{ job.status }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function removeApplication(applicationId) {
+            fetch(`/remove_application/${applicationId}`, {
+                method: 'POST'
+            }).then(response => {
+                if (response.ok) {
+                    location.reload();
+                }
+            });
+        }
+        function toggleMenu() {
+        const links = document.getElementById('nav-links');
+        const button = document.getElementById('hamburger');
+        const expanded = links.classList.toggle('show');
+        button.setAttribute('aria-expanded', expanded);
+    }
+    </script>
+</body>
+
+</html>
