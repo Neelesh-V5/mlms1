@@ -19,7 +19,7 @@
 
     .loader {
       text-align: center;
-      animation: fadeIn 5s ease-in-out;
+      animation: fadeIn 1s ease-in-out;
     }
 
     .spinner {
@@ -29,7 +29,7 @@
       width: 60px;
       height: 60px;
       margin: 0 auto 20px;
-      animation: spin 5s linear infinite;
+      animation: spin 1s linear infinite;
     }
 
     @keyframes spin {
@@ -53,12 +53,14 @@
     <h1>Redirecting... Please wait</h1>
   </div>
 
-  
-</body>
+  <!-- Place script just before </body> so it's guaranteed to run after render -->
   <script>
-    // Redirect after 2.5 seconds
-    setTimeout(function() {
-      window.location.href = "https://neilthedev05.pythonanywhere.com/";  // change this to your target URL
-    }, 10000);
+    document.addEventListener("DOMContentLoaded", function () {
+      console.log("Page loaded. Waiting to redirect...");
+      setTimeout(function () {
+        window.location.href = "/destination"; // <- CHANGE this to your real path
+      }, 5000); // 5000 ms = 5 seconds
+    });
   </script>
+</body>
 </html>
