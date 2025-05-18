@@ -1,1 +1,63 @@
-<meta http-equiv="refresh" content="0; url=https://neilthedev05.pythonanywhere.com/">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Redirecting...</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(135deg, #4e54c8, #8f94fb);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .loader {
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .spinner {
+      border: 8px solid rgba(255, 255, 255, 0.2);
+      border-top: 8px solid white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 20px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <div class="spinner"></div>
+    <h1>Redirecting... Please wait</h1>
+  </div>
+
+  <script>
+    // Redirect after 2.5 seconds
+    setTimeout(function() {
+      window.location.href = "https://neilthedev05.pythonanywhere.com/";  // change this to your target URL
+    }, 2500);
+  </script>
+</body>
+</html>
