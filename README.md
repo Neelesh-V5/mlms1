@@ -1,6 +1,3 @@
-
----
-
 # 🧳 Migrant Labour Management System (MLMS)
 
 A digital platform developed to improve the working conditions of migrant labourers in Tamil Nadu by facilitating direct connections with employers, ensuring fair wages, providing multilingual support, and giving access to relevant government welfare schemes.
