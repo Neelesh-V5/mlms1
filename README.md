@@ -1,4 +1,3 @@
-Based on the detailed lab report you provided, here's a professional and well-structured `README.md` file for the **Migrant Labour Management System (MLMS)** project:
 
 ---
 
@@ -121,7 +120,6 @@ The system has been tested with detailed test cases across multiple use cases:
 * ✔ Login/Authentication
 * ✔ Government Scheme Access
 
-📝 Refer to [Chapter 5 – Test Suites](#) in the documentation for more.
 
 ---
 
