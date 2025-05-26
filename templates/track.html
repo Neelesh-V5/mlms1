@@ -165,10 +165,74 @@
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
         }
+    #google_translate_element {
+            text-align: right;
+            margin: 1rem;
+            font-family: Arial, sans-serif;
+        }
+
+        .goog-te-gadget {
+            font-size: 14px;
+            color: #333 !important;
+        }
+
+        .goog-te-gadget-simple {
+            background-color: #e0f7fa;
+            border-radius: 6px;
+            padding: 5px 10px;
+            border: 1px solid #007bff;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .goog-te-gadget-simple .goog-te-menu-value {
+            font-weight: bold;
+            color: #007bff !important;
+        }
+
+        .goog-te-gadget-icon {
+            display: none;
+        }
+
+        iframe.goog-te-banner-frame {
+            display: none !important;
+        }
+
+        body {
+            top: 0px !important;
+        }
+
+        .goog-te-menu-frame.skiptranslate {
+            border: none !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .goog-te-menu-value span {
+            color: #007bff !important;
+        }
     </style>
 </head>
 
 <body>
+    <div id="google_translate_element"></div>
+      
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement(
+                {
+                    pageLanguage: 'en',
+                    includedLanguages: 'en,hi,ta,te,bn,ml,kn,gu,mr,pa,or', // Only Indian languages
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                },
+                'google_translate_element'
+            );
+        }
+    </script>
+
+    <script type="text/javascript"
+        src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+        </script>
     <nav class="navbar">
         <div class="navbar-container">
             <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>

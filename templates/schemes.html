@@ -181,33 +181,98 @@
                 padding: 15px;
             }
         }
+
+        #google_translate_element {
+            text-align: right;
+            margin: 1rem;
+            font-family: Arial, sans-serif;
+        }
+
+        .goog-te-gadget {
+            font-size: 14px;
+            color: #333 !important;
+        }
+
+        .goog-te-gadget-simple {
+            background-color: #e0f7fa;
+            border-radius: 6px;
+            padding: 5px 10px;
+            border: 1px solid #007bff;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .goog-te-gadget-simple .goog-te-menu-value {
+            font-weight: bold;
+            color: #007bff !important;
+        }
+
+        .goog-te-gadget-icon {
+            display: none;
+        }
+
+        iframe.goog-te-banner-frame {
+            display: none !important;
+        }
+
+        body {
+            top: 0px !important;
+        }
+
+        .goog-te-menu-frame.skiptranslate {
+            border: none !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .goog-te-menu-value span {
+            color: #007bff !important;
+        }
     </style>
 </head>
 
 <body>
+    <div id="google_translate_element"></div>
+      
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement(
+                {
+                    pageLanguage: 'en',
+                    includedLanguages: 'en,hi,ta,te,bn,ml,kn,gu,mr,pa,or', // Only Indian languages
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                },
+                'google_translate_element'
+            );
+        }
+    </script>
+
+    <script type="text/javascript"
+        src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+        </script>
     <nav class="navbar">
         <div class="navbar-container">
             <div class="hamburger" onclick="toggleMenu()" id="hamburger">☰</div>
             <ul class="nav-links" id="nav-links">
-                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
-                <li><a href="{{ url_for('view_messages') }}">Messages</a></li>
+                <li><a href="{{ url_for('dashboard') }}" data-translate="dashboard">Dashboard</a></li>
+                <li><a href="{{ url_for('view_messages') }}" data-translate="messages">Messages</a></li>
                 {% if session.user_role == 'laborer' %}
-                <li><a href="{{ url_for('grievance') }}">Grievance</a></li>
-                <li><a href="{{ url_for('schemes') }}">Schemes</a></li>
-                <li><a href="{{ url_for('search_jobs') }}">Search Jobs</a></li>
-                <li><a href="{{ url_for('track_applications') }}">Track Applications</a></li>
+                <li><a href="{{ url_for('grievance') }}" data-translate="grievance">Grievance</a></li>
+                <li><a href="{{ url_for('schemes') }}" data-translate="schemes">Schemes</a></li>
+                <li><a href="{{ url_for('search_jobs') }}" data-translate="search_jobs">Search Jobs</a></li>
+                <li><a href="{{ url_for('track_applications') }}" data-translate="track_applications">Track
+                        Applications</a></li>
                 {% else %}
-                <li><a href="{{ url_for('offer_job') }}">Offer Job</a></li>
-                <li><a href="{{ url_for('view_applications') }}">View Applications</a></li>
+                <li><a href="{{ url_for('offer_job') }}" data-translate="offer_job">Offer Job</a></li>
+                <li><a href="{{ url_for('view_applications') }}" data-translate="view_applications">View
+                        Applications</a></li>
                 {% endif %}
-                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                <li><a href="{{ url_for('logout') }}" data-translate="logout">Logout</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="container">
-
-        <!-- ✅ Flash Message Container -->
         {% with messages = get_flashed_messages(with_categories=True) %}
         {% if messages %}
         <div class="flash-messages">
@@ -219,19 +284,22 @@
         {% endwith %}
 
         {% if not session.get('user_id') %}
-        <p class="error-message">User is not logged in to the MLMS</p>
-        <a href="{{ url_for('home') }}" class="btn">Go to Login</a>
+        <p class="error-message" data-translate="not_logged_in">User is not logged in to the MLMS</p>
+        <a href="{{ url_for('home') }}" class="btn" data-translate="go_to_login">Go to Login</a>
         {% else %}
-        <h1>Government Schemes for Migrant Laborers</h1>
+        <h1 data-translate="main_heading">Government Schemes for Migrant Laborers</h1>
 
         {% if schemes %}
         {% for scheme in schemes %}
         <div class="scheme-card">
-            <h2>{{ scheme['title'] }}</h2>
-            <p><strong>Offered by:</strong> {{ scheme['offered_by'] }}</p>
-            <p>{{ scheme['description'] }}</p>
+            <h2 data-translate="title-{{scheme.id}}">{{ scheme['title'] }}</h2>
+            <p>
+                <strong data-translate="offered_by">Offered by:</strong><span data-translate="off-{{scheme.id}}">{{
+                    scheme['offered_by'] }}
+            </p>
+            <p data-translate="desc-{{scheme.id}}">{{ scheme['description'] }}</p>
 
-            <h3>Eligibility Criteria:</h3>
+            <h3 data-translate="eligibility">Eligibility Criteria:</h3>
             <ul class="eligibility-list">
                 {% for point in scheme['eligibility_points'].split(', ') %}
                 <li>{{ point }}</li>
@@ -239,25 +307,118 @@
             </ul>
 
             <p>
-                <a href="{{ scheme['registration_link'] }}" class="btn" target="_blank">Register</a>
-                <a href="{{ scheme['read_more_link'] }}" class="btn" target="_blank">Read More</a>
+                <a href="{{ scheme['registration_link'] }}" class="btn" target="_blank"
+                    data-translate="register">Register</a>
+                <a href="{{ scheme['read_more_link'] }}" class="btn" target="_blank" data-translate="read_more">Read
+                    More</a>
             </p>
         </div>
         {% endfor %}
         {% else %}
-        <p>No schemes available at the moment.</p>
+        <p data-translate="no_schemes">No schemes available at the moment.</p>
         {% endif %}
         {% endif %}
     </div>
 
+    <!-- <script>
+        function toggleMenu() {
+            const links = document.getElementById('nav-links');
+            const button = document.getElementById('hamburger');
+            const expanded = links.classList.toggle('show');
+            button.setAttribute('aria-expanded', expanded);
+        }
+
+        const translations = {
+            en: {
+                "page-title": "Government Schemes",
+                "dashboard": "Dashboard",
+                "messages": "Messages",
+                "grievance": "Grievance",
+                "schemes": "Schemes",
+                "search_jobs": "Search Jobs",
+                "track_applications": "Track Applications",
+                "offer_job": "Offer Job",
+                "view_applications": "View Applications",
+                "logout": "Logout",
+                "not_logged_in": "User is not logged in to the MLMS",
+                "go_to_login": "Go to Login",
+                "main_heading": "Government Schemes for Migrant Laborers",
+                "offered_by": "Offered by:",
+                "eligibility": "Eligibility Criteria:",
+                "register": "Register",
+                "read_more": "Read More",
+                "no_schemes": "No schemes available at the moment.",
+                "title-1": "Pradhhan Mantri Shram Yogi Maandhan Yojana",
+                "title-2": "Building and Other Construction Workers (BOCW) Welfare Scheme",
+                "title-3": "PM SVANidhi",
+                "title-4": "One Nation One Ration Card",
+                "title-5": "Migrants Employment Generation Programme"
+            },
+            hindi: {
+                "page-title": "सरकारी योजनाएं",
+                "dashboard": "डैशबोर्ड",
+                "messages": "संदेश",
+                "grievance": "शिकायत",
+                "schemes": "योजनाएं",
+                "search_jobs": "नौकरियां खोजें",
+                "track_applications": "आवेदन ट्रैक करें",
+                "offer_job": "नौकरी प्रदान करें",
+                "view_applications": "आवेदन देखें",
+                "logout": "लॉगआउट",
+                "not_logged_in": "उपयोगकर्ता एमएलएमएस में लॉग इन नहीं है",
+                "go_to_login": "लॉगिन पर जाएं",
+                "main_heading": "प्रवासी श्रमिकों के लिए सरकारी योजनाएं",
+                "offered_by": "द्वारा प्रदान की गई:",
+                "eligibility": "पात्रता मापदंड:",
+                "register": "पंजीकरण करें",
+                "read_more": "और पढ़ें",
+                "no_schemes": "इस समय कोई योजना उपलब्ध नहीं है।",
+                "title-1": "प्रधानमंत्री श्रम योगी मानधन योजना",
+                "title-2": "भवन एवं अन्य निर्माण श्रमिक (बीओसीडब्ल्यू) कल्याण योजना",
+                "title-3": "पीएम स्वनिधि",
+                "title-4": "एक राष्ट्र एक राशन कार्ड",
+                "title-5": "प्रवासी रोजगार सृजन कार्यक्रम"
+            },
+            tamil: {
+                "page-title": "அரசுத் திட்டங்கள்",
+                "dashboard": "டாஷ்போர்டு",
+                "messages": "செய்திகள்",
+                "grievance": "புகார்",
+                "schemes": "திட்டங்கள்",
+                "search_jobs": "வேலை தேடல்",
+                "track_applications": "விண்ணப்பங்களை கண்காணிக்கவும்",
+                "offer_job": "வேலை வழங்குங்கள்",
+                "view_applications": "விண்ணப்பங்களை பார்வையிடுக",
+                "logout": "வெளியேறு",
+                "not_logged_in": "பயனர் MLMS இல் உள்நுழையவில்லை",
+                "go_to_login": "உள்நுழைவு செல்லவும்",
+                "main_heading": "பகிரங்க தொழிலாளர்களுக்கான அரசுத் திட்டங்கள்",
+                "offered_by": "வழங்குபவர்:",
+                "eligibility": "தகுதி விதிகள்:",
+                "register": "பதிவு செய்யவும்",
+                "read_more": "மேலும் வாசிக்க",
+                "no_schemes": "தற்போது எந்தத் திட்டமும் இல்லை.",
+                "title-1": "பிரதான் மந்திரி ஷ்ரம் யோகி மன்தன் யோஜனா",
+                "title-2": "கட்டிடம் மற்றும் பிற கட்டுமானத் தொழிலாளர்கள் (BOCW) நலத்திட்டம்",
+                "title-3": "PM SVANidhi",
+                "title-4": "ஒரு நாடு ஒரு ரேஷன் அட்டை",
+                "title-5": "புலம்பெயர்ந்தோர் வேலைவாய்ப்பு உருவாக்கும் திட்டம்"
+
+            }
+        };
+
+        function translatePage(lang) {
+            document.querySelectorAll("[data-translate]").forEach(el => {
+                if (translations[lang][el.dataset.translate]) {
+                    el.innerText = translations[lang][el.dataset.translate];
+                }
+            });
+        }
+
+        document.getElementById("language-switch").addEventListener("change", function () {
+            translatePage(this.value);
+        });
+    </script> -->
 </body>
-<script>
-    function toggleMenu() {
-        const links = document.getElementById('nav-links');
-        const button = document.getElementById('hamburger');
-        const expanded = links.classList.toggle('show');
-        button.setAttribute('aria-expanded', expanded);
-    }
-</script>
 
 </html>

@@ -10,7 +10,8 @@ import uuid
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_key'
-DATABASE = 'database.db'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, 'database.db')
 
 # Configure static and template folders
 app.static_folder = 'static'
@@ -759,8 +760,9 @@ def verify_otp():
             if new_password == confirm_password:
                 db = get_db()
                 cursor = db.cursor()
+                password = generate_password_hash(request.form['new_password'], method='pbkdf2:sha256')
                 cursor.execute("UPDATE employers SET password = ? WHERE email = ?", 
-                               (new_password, session['reset_email']))
+                               (password, session['reset_email']))
                 db.commit()
                 session.pop('otp', None)
                 session.pop('reset_email', None)

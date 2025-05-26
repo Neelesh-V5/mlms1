@@ -9,8 +9,15 @@
 </head>
 
 <body>
+
     <div class="container">
-        <h2>Laborer Registration</h2>
+        <select class="translation" id="language-switch">
+            <option value="en">English</option>
+            <option value="hindi">हिंदी</option>
+            <option value="tamil">தமிழ்</option>
+        </select>
+
+        <h2 data-translate="title">Laborer Registration</h2>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -23,14 +30,14 @@
         {% endwith %}
 
         <form action="/register/laborer" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-            <label for="name">Name:</label>
+
+            <label for="name" data-translate="name">Name:</label>
             <input type="text" id="name" name="name" required>
 
-            <label for="phone">Phone No:</label>
-            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number"
-                required>
+            <label for="phone" data-translate="phone">Phone No:</label>
+            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
 
-            <label for="language">Preferred Language:</label>
+            <label for="language" data-translate="language">Preferred Language:</label>
             <select id="language" name="language">
                 <option value="hindi">Hindi</option>
                 <option value="bengali">Bengali</option>
@@ -40,62 +47,166 @@
                 <option value="urdu">Urdu</option>
             </select>
 
-            <label for="aadhar">Aadhar No.:</label>
-            <input type="text" id="aadhar" name="aadhar" pattern="[0-9]{12}"
-                title="Enter a valid 12-digit Aadhar number" required>
+            <label for="aadhar" data-translate="aadhar">Aadhar No.:</label>
+            <input type="text" id="aadhar" name="aadhar" pattern="[0-9]{12}" required>
 
-            <label for="dob">Date of Birth:</label>
+            <label for="dob" data-translate="dob">Date of Birth:</label>
             <input type="date" id="dob" name="dob" required>
 
-            <label>Sex:</label>
+            <label data-translate="sex">Sex:</label>
             <div class="sex-options">
                 <input type="radio" id="male" name="sex" value="male" required>
-                <label for="male">Male</label>
+                <label for="male" data-translate="male">Male</label>
                 <input type="radio" id="female" name="sex" value="female" required>
-                <label for="female">Female</label>
+                <label for="female" data-translate="female">Female</label>
             </div>
 
-            <label for="address">Address:</label>
+            <label for="address" data-translate="address">Address:</label>
             <textarea id="address" name="address" required></textarea>
 
-            <label>Abilities:</label>
+            <label data-translate="abilities">Abilities:</label>
             <div class="checkbox-group">
                 {% for ability in ['construction', 'plumbing', 'electrician', 'carpentry', 'painting', 'gardening',
                 'welding', 'masonry', 'mechanic', 'factory-worker'] %}
                 <div>
                     <input type="checkbox" id="{{ ability }}" name="abilities" value="{{ ability }}">
-                    <label for="{{ ability }}">{{ ability.replace('-', ' ').title() }}</label>
+                    <label for="{{ ability }}" data-translate="{{ ability }}">{{ ability.replace('-', ' ').title() }}</label>
                 </div>
                 {% endfor %}
             </div>
 
-
-
-            <label for="employment-length">Length of Employment:</label>
+            <label for="employment-length" data-translate="employment_length">Length of Employment:</label>
             <input type="number" id="employment-length" name="employment-length" min="1" required>
             <select id="employment-unit" name="employment-unit">
-                <option value="days">Days</option>
-                <option value="months">Months</option>
+                <option value="days" data-translate="days">Days</option>
+                <option value="months" data-translate="months">Months</option>
             </select>
 
-            <label for="photo">Upload Photo:</label>
+            <label for="photo" data-translate="photo">Upload Photo:</label>
             <input type="file" id="photo" name="photo" accept="image/*" required>
 
-            <label for="employment-proof">Proof of Employment:</label>
+            <label for="employment-proof" data-translate="proof">Proof of Employment:</label>
             <input type="file" id="employment-proof" name="employment-proof" required>
 
-            <label for="password">Password:</label>
+            <label for="password" data-translate="password">Password:</label>
             <input type="password" id="password" name="password" required>
 
-            <label for="confirm-password">Confirm Password:</label>
+            <label for="confirm-password" data-translate="confirm_password">Confirm Password:</label>
             <input type="password" id="confirm-password" name="confirm-password" required>
 
-            <button type="submit">Register</button>
+            <button type="submit" data-translate="register">Register</button>
         </form>
     </div>
-
-
     <script>
+        const translations = {
+            en: {
+                title: "Laborer Registration",
+                name: "Name:",
+                phone: "Phone No:",
+                language: "Preferred Language:",
+                aadhar: "Aadhar No.:",
+                dob: "Date of Birth:",
+                sex: "Sex:",
+                male: "Male",
+                female: "Female",
+                address: "Address:",
+                abilities: "Abilities:",
+                employment_length: "Length of Employment:",
+                days: "Days",
+                months: "Months",
+                photo: "Upload Photo:",
+                proof: "Proof of Employment:",
+                password: "Password:",
+                confirm_password: "Confirm Password:",
+                register: "Register",
+                construction: "Construction",
+                plumbing: "Plumbing",
+                electrician: "Electrician",
+                carpentry: "Carpentry",
+                painting: "Painting",
+                gardening: "Gardening",
+                welding: "Welding",
+                masonry: "Masonry",
+                mechanic: "Mechanic",
+                "factory-worker": "Factory Worker"
+            },
+            hindi: {
+                title: "श्रमिक पंजीकरण",
+                name: "नाम:",
+                phone: "फोन नंबर:",
+                language: "पसंदीदा भाषा:",
+                aadhar: "आधार नंबर:",
+                dob: "जन्म तिथि:",
+                sex: "लिंग:",
+                male: "पुरुष",
+                female: "महिला",
+                address: "पता:",
+                abilities: "कौशल:",
+                employment_length: "नौकरी की अवधि:",
+                days: "दिन",
+                months: "महीने",
+                photo: "फोटो अपलोड करें:",
+                proof: "रोजगार का प्रमाण:",
+                password: "पासवर्ड:",
+                confirm_password: "पासवर्ड की पुष्टि करें:",
+                register: "पंजीकरण करें",
+                construction: "निर्माण",
+                plumbing: "प्लंबिंग",
+                electrician: "बिजली मिस्त्री",
+                carpentry: "बढ़ईगीरी",
+                painting: "पेंटिंग",
+                gardening: "बागवानी",
+                welding: "वेल्डिंग",
+                masonry: "राजमिस्त्री",
+                mechanic: "मिस्त्री",
+                "factory-worker": "फैक्टरी कर्मचारी"
+            },
+            tamil: {
+                title: "தொழிலாளர் பதிவு",
+                name: "பெயர்:",
+                phone: "தொலைபேசி எண்:",
+                language: "விருப்பமான மொழி:",
+                aadhar: "ஆதார் எண்:",
+                dob: "பிறந்த தேதி:",
+                sex: "பாலினம்:",
+                male: "ஆண்",
+                female: "பெண்",
+                address: "முகவரி:",
+                abilities: "திறன்கள்:",
+                employment_length: "வேலை அனுபவம்:",
+                days: "நாட்கள்",
+                months: "மாதங்கள்",
+                photo: "புகைப்படம் பதிவேற்றவும்:",
+                proof: "வேலை சான்று:",
+                password: "கடவுச்சொல்:",
+                confirm_password: "கடவுச்சொல்லை உறுதிப்படுத்தவும்:",
+                register: "பதிவு செய்யவும்",
+                construction: "கட்டிடம்",
+                plumbing: "குழாய் வேலை",
+                electrician: "மின்சார தொழிலாளர்",
+                carpentry: "தச்சு வேலை",
+                painting: "ஓவியம்",
+                gardening: "தோட்டக்கலை",
+                welding: "வெல்டிங்",
+                masonry: "கட்டிடக்கலைஞர்",
+                mechanic: "இயந்திரவியலாளர்",
+                "factory-worker": "தொழிற்சாலை பணியாளர்"
+            }
+        };
+
+        function translatePage(lang) {
+            document.querySelectorAll("[data-translate]").forEach(el => {
+                const key = el.getAttribute("data-translate");
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+        }
+
+        document.getElementById("language-switch").addEventListener("change", function () {
+            const selectedLang = this.value;
+            translatePage(selectedLang);
+        });
         function validateForm() {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
