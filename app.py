@@ -713,6 +713,64 @@ def login():
         else:
             return render_template('login.html', error="Invalid credentials!", messages=messages)
 
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    db = get_db()
+    cursor = db.cursor()
+
+    if request.method == 'POST':
+        email = request.form['email']
+
+        cursor.execute("SELECT * FROM employers WHERE email = ?", (email,))
+        employer = cursor.fetchone()
+
+        if employer:
+            otp = str(random.randint(100000, 999999))
+            session['otp'] = otp
+            session['reset_email'] = email
+
+            # Send OTP
+            msg = MIMEText(f'Your OTP for password reset is: {otp}')
+            msg['Subject'] = 'OTP for Password Reset'
+            msg['From'] = formataddr(('Admin', 'neilthedev05@gmail.com'))
+            msg['To'] = email
+
+            try:
+                with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                    server.starttls()
+                    server.login('neilthedev05@gmail.com', 'umzb gufm kawt edee')
+                    server.send_message(msg)
+                flash('OTP sent to your email.', 'success')
+                return redirect(url_for('verify_otp'))
+            except Exception as e:
+                flash(f'Error sending email: {str(e)}', 'error')
+        else:
+            flash('Email not found.', 'error')
+    return render_template('forgot_password.html')
+
+@app.route('/verify-otp', methods=['GET', 'POST'])
+def verify_otp():
+    if request.method == 'POST':
+        entered_otp = request.form['otp']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+
+        if entered_otp == session.get('otp'):
+            if new_password == confirm_password:
+                db = get_db()
+                cursor = db.cursor()
+                cursor.execute("UPDATE employers SET password = ? WHERE email = ?", 
+                               (new_password, session['reset_email']))
+                db.commit()
+                session.pop('otp', None)
+                session.pop('reset_email', None)
+                flash('Password reset successfully.', 'success')
+                return redirect(url_for('login'))
+            else:
+                flash('Passwords do not match.', 'error')
+        else:
+            flash('Invalid OTP.', 'error')
+    return render_template('verify_otp.html')
 
 
 
