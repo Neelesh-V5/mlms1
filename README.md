@@ -4,15 +4,21 @@ A digital platform developed to improve the working conditions of migrant labour
 
 ---
 
+
 ## 📘 Overview
 
-The MLMS aims to:
+The **Migrant Labour Management System (MLMS)** is a comprehensive web application developed to streamline and safeguard the employment journey of migrant workers in Tamil Nadu. As a state with a growing influx of migrant labourers, Tamil Nadu faces challenges in managing worker identity, job access, fair compensation, and welfare benefits. The MLMS project addresses these gaps by:
 
-* Eliminate exploitation by middlemen
-* Enable direct wage negotiation between labourers and employers
-* Improve awareness and access to welfare schemes
-* Support multiple Indian languages for better communication
-* Provide grievance redressal, job search, and application tracking functionalities
+* Enabling **centralized digital registration** for labourers and employers
+* Generating **unique digital IDs** to authenticate worker identities
+* Allowing **migrant workers to browse and apply** for jobs without third-party interference
+* Empowering employers to **post verified job offers** directly
+* Providing **transparent wage information** and enabling **direct negotiation**
+* Offering **multilingual support** to break language barriers
+* Supporting access to **government welfare schemes** with eligibility information
+* Facilitating **grievance redressal mechanisms** and **admin-level resolution**
+
+Designed with inclusivity and usability in mind, MLMS aims to bridge the gap between migrant workers, employers, and government services—ensuring dignity, fairness, and opportunity for one of the most vulnerable sections of the workforce.
 
 ---
 
